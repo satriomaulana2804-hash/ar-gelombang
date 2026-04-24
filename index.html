@@ -1,91 +1,89 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8" />
-    <title>AR Gelombang</title>
+<head>
+  <meta charset="utf-8">
+  <title>AR Gelombang Sinus</title>
 
-    <!-- A-Frame -->
-    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+  <!-- A-Frame -->
+  <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
 
-    <!-- AR.js -->
-    <script src="https://cdn.jsdelivr.net/npm/ar.js@3.3.2/aframe/build/aframe-ar.js"></script>
-  </head>
+  <!-- AR.js -->
+  <script src="https://cdn.jsdelivr.net/npm/ar.js@3.3.2/aframe/build/aframe-ar.js"></script>
+</head>
 
-  <body style="margin: 0; overflow: hidden">
-    <!-- UI CONTROL -->
-    <div
-      style="
-        position: fixed;
-        top: 10px;
-        left: 10px;
-        z-index: 10;
-        background: white;
-        padding: 10px;
-        border-radius: 10px;
-      "
-    >
-      <label>Amplitudo</label><br />
-      <input
-        type="range"
-        id="amp"
-        min="0.5"
-        max="2"
-        step="0.1"
-        value="1"
-      /><br />
+<body style="margin:0; overflow:hidden; font-family:Arial;">
 
-      <label>Frekuensi</label><br />
-      <input type="range" id="freq" min="1" max="10" step="1" value="3" />
-    </div>
+<!-- UI -->
+<div style="position:fixed; top:10px; left:10px; z-index:10; background:white; padding:12px; border-radius:10px;">
+  <b>Kontrol Gelombang</b><br><br>
 
-    <a-scene embedded arjs>
-      <!-- Marker -->
-      <a-marker preset="hiro">
-  <a-box position="0 0.5 0" color="red"></a-box>
-</a-marker>
+  Amplitudo: <span id="valA">1</span><br>
+  <input type="range" id="amp" min="0.5" max="2" step="0.1" value="1"><br><br>
 
-      <!-- Kamera -->
-      <a-entity camera></a-entity>
-    </a-scene>
+  Frekuensi: <span id="valF">3</span><br>
+  <input type="range" id="freq" min="1" max="10" step="1" value="3">
+</div>
 
-    <script>
-      let wave = document.querySelector("#wave");
+<a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
 
-      let A = 1;
-      let f = 3;
-      let t = 0;
+  <!-- MARKER -->
+  <a-marker preset="hiro">
+    <a-entity id="wave"></a-entity>
+  </a-marker>
 
-      document.getElementById("amp").oninput = (e) => (A = e.target.value);
-      document.getElementById("freq").oninput = (e) => (f = e.target.value);
+  <!-- CAMERA -->
+  <a-entity camera></a-entity>
 
-      function createWave() {
-        let points = [];
-        let length = 6;
-        let segments = 100;
+</a-scene>
 
-        for (let i = 0; i < segments; i++) {
-          let x = (i / segments) * length;
-          let y = A * Math.sin(x * f - t);
-          points.push(`${x} ${y} 0`);
-        }
+<script>
+let wave = document.querySelector("#wave");
 
-        let line = document.createElement("a-entity");
-        line.setAttribute("line__path", {
-          path: points.join(", "),
-          color: "blue",
-        });
+let A = 1;
+let f = 3;
+let t = 0;
 
-        wave.innerHTML = "";
-        wave.appendChild(line);
-      }
+// slider
+let ampSlider = document.getElementById("amp");
+let freqSlider = document.getElementById("freq");
 
-      function animate() {
-        t += 0.1;
-        createWave();
-        requestAnimationFrame(animate);
-      }
+ampSlider.oninput = function(){
+  A = parseFloat(this.value);
+  document.getElementById("valA").innerText = A;
+}
 
-      animate();
-    </script>
-  </body>
+freqSlider.oninput = function(){
+  f = parseFloat(this.value);
+  document.getElementById("valF").innerText = f;
+}
+
+// buat gelombang (titik-titik stabil)
+function createWave(){
+  if(!wave) return;
+
+  wave.innerHTML = "";
+
+  for(let x=-3; x<=3; x+=0.15){
+    let y = A * Math.sin(f * x - t);
+
+    let point = document.createElement("a-sphere");
+    point.setAttribute("position", `${x} ${y} 0`);
+    point.setAttribute("radius", "0.05");
+    point.setAttribute("color", "#0077ff");
+
+    wave.appendChild(point);
+  }
+}
+
+// animasi
+function animate(){
+  t += 0.08;
+  createWave();
+  requestAnimationFrame(animate);
+}
+
+animate();
+</script>
+
+</body>
 </html>
