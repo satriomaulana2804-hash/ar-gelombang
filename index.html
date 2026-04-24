@@ -4,19 +4,14 @@
   <meta charset="utf-8">
   <title>AR Gelombang Sinus</title>
 
-  <!-- A-Frame -->
   <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
-
-  <!-- AR.js -->
   <script src="https://cdn.jsdelivr.net/npm/ar.js@3.3.2/aframe/build/aframe-ar.js"></script>
 </head>
 
-<body style="margin:0; overflow:hidden; font-family:Arial;">
+<body style="margin:0; overflow:hidden;">
 
 <!-- UI -->
-<div style="position:fixed; top:10px; left:10px; z-index:10; background:white; padding:12px; border-radius:10px;">
-  <b>Kontrol Gelombang</b><br><br>
-
+<div style="position:fixed; top:10px; left:10px; z-index:10; background:white; padding:10px; border-radius:10px;">
   Amplitudo: <span id="valA">1</span><br>
   <input type="range" id="amp" min="0.5" max="2" step="0.1" value="1"><br><br>
 
@@ -24,14 +19,17 @@
   <input type="range" id="freq" min="1" max="10" step="1" value="3">
 </div>
 
-<a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
+<a-scene
+  embedded
+  vr-mode-ui="enabled: false"
+  device-orientation-permission-ui="enabled: true"
+  arjs="sourceType: webcam; debugUIEnabled: true;"
+>
 
-  <!-- MARKER -->
   <a-marker preset="hiro">
     <a-entity id="wave"></a-entity>
   </a-marker>
 
-  <!-- CAMERA -->
   <a-entity camera></a-entity>
 
 </a-scene>
@@ -43,21 +41,16 @@ let A = 1;
 let f = 3;
 let t = 0;
 
-// slider
-let ampSlider = document.getElementById("amp");
-let freqSlider = document.getElementById("freq");
-
-ampSlider.oninput = function(){
+document.getElementById("amp").oninput = function(){
   A = parseFloat(this.value);
   document.getElementById("valA").innerText = A;
-}
+};
 
-freqSlider.oninput = function(){
+document.getElementById("freq").oninput = function(){
   f = parseFloat(this.value);
   document.getElementById("valF").innerText = f;
-}
+};
 
-// buat gelombang (titik-titik stabil)
 function createWave(){
   if(!wave) return;
 
@@ -75,7 +68,6 @@ function createWave(){
   }
 }
 
-// animasi
 function animate(){
   t += 0.08;
   createWave();
