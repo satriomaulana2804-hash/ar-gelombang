@@ -1,0 +1,91 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>AR Gelombang</title>
+
+    <!-- A-Frame -->
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+
+    <!-- AR.js -->
+    <script src="https://cdn.jsdelivr.net/npm/ar.js@3.3.2/aframe/build/aframe-ar.js"></script>
+  </head>
+
+  <body style="margin: 0; overflow: hidden">
+    <!-- UI CONTROL -->
+    <div
+      style="
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        z-index: 10;
+        background: white;
+        padding: 10px;
+        border-radius: 10px;
+      "
+    >
+      <label>Amplitudo</label><br />
+      <input
+        type="range"
+        id="amp"
+        min="0.5"
+        max="2"
+        step="0.1"
+        value="1"
+      /><br />
+
+      <label>Frekuensi</label><br />
+      <input type="range" id="freq" min="1" max="10" step="1" value="3" />
+    </div>
+
+    <a-scene embedded arjs>
+      <!-- Marker -->
+      <a-marker preset="hiro">
+        <a-entity id="wave"></a-entity>
+      </a-marker>
+
+      <!-- Kamera -->
+      <a-entity camera></a-entity>
+    </a-scene>
+
+    <script>
+      let wave = document.querySelector("#wave");
+
+      let A = 1;
+      let f = 3;
+      let t = 0;
+
+      document.getElementById("amp").oninput = (e) => (A = e.target.value);
+      document.getElementById("freq").oninput = (e) => (f = e.target.value);
+
+      function createWave() {
+        let points = [];
+        let length = 6;
+        let segments = 100;
+
+        for (let i = 0; i < segments; i++) {
+          let x = (i / segments) * length;
+          let y = A * Math.sin(x * f - t);
+          points.push(`${x} ${y} 0`);
+        }
+
+        let line = document.createElement("a-entity");
+        line.setAttribute("line__path", {
+          path: points.join(", "),
+          color: "blue",
+        });
+
+        wave.innerHTML = "";
+        wave.appendChild(line);
+      }
+
+      function animate() {
+        t += 0.1;
+        createWave();
+        requestAnimationFrame(animate);
+      }
+
+      animate();
+    </script>
+  </body>
+</html>
